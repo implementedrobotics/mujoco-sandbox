@@ -5,8 +5,6 @@ This repository serves as a sandbox for testing Mujoco physics simulator functio
 ## Prerequisites
 
 - Python 3.6 or higher
-- Mujoco 2.0 or higher
-- A valid Mujoco license
 
 ## Setup and Installation
 
