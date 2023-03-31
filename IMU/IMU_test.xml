@@ -1,0 +1,38 @@
+<mujoco model="IMU_test">
+	<compiler angle="radian" coordinate="local" />
+	<option gravity="0 0 -9.81" integrator="RK4" timestep="0.001">
+		<flag contact="disable" sensornoise="disable" />
+	</option>
+	<asset>
+		<texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
+		<material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2" />
+	</asset>
+	<worldbody>
+		<geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" />
+		<light name="spotlight" mode="targetbodycom" target="box_body" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10" />
+		<body name="box_body" pos="0 0 .25">
+			<camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom" />
+			<camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom" />
+			<!-- <joint name="box_joint" type="ball" /> -->
+			<joint name="roll_joint" type="hinge" pos="0 0 0" axis="1 0 0" />
+			<joint name="pitch_joint" type="hinge" pos="0 0 0" axis="0 1 0" />
+			<joint name="yaw_joint" type="hinge" pos="0 0 0" axis="0 0 1" />
+			<inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+			<geom type="box" size="0.1 0.1 0.1" rgba="0.8 0 0 1" />
+			<site name="imu_site" pos="0 0 0" size="0.01" />
+		</body>
+	</worldbody>
+	<sensor>
+		<accelerometer name="BMI088_ACC" site="imu_site" noise="0.0018" />
+		<gyro name="BMI088_GYR" site="imu_site" noise="0.00244" />
+		<magnetometer name="BMI088_MAG" site="imu_site" />
+	</sensor>
+	<actuator>
+		<!-- <motor name="roll_motor" joint="roll_joint" /> -->
+		<velocity name="roll_velocity" joint="roll_joint" kv="100" />
+		<!-- <motor name="pitch_motor" joint="pitch_joint" /> -->
+		<velocity name="pitch_velocity" joint="pitch_joint" kv="100" />
+		<!-- <motor name="yaw_motor" joint="yaw_joint" /> -->
+		<velocity name="yaw_velocity" joint="yaw_joint" kv="100" />
+	</actuator>
+</mujoco>
