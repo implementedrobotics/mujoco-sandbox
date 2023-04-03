@@ -4,6 +4,8 @@ import mujoco_viewer
 import math
 import numpy as np
 
+from transforms3d import euler
+
 
 def get_sensor_offset(model, sensor_id):
     """
@@ -64,13 +66,65 @@ class IMU:
                                          self.gyro_offset + 3]
         self.mag = self.data.sensordata[self.mag_offset: self.mag_offset + 3]
 
+    def compute_orientation(self):
+        """
+        Compute the orientation of the IMU using the magnetometer data.
+        """
+
+        # ax_ned = -self.accel[1]
+        # ay_ned = self.accel[0]
+        # az_ned = -self.accel[2]
+        # g = np.array([ax_ned, ay_ned, -9.81])
+
+        # Compute Pitch and Roll from Accelerometer
+        pitch = math.asin(self.accel[0] / (-9.81))
+
+        roll = math.atan(self.accel[1] / self.accel[2])
+
+        # roll = math.atan2(-self.accel[0],
+        #                   math.sqrt(self.accel[1]**2 + self.accel[2]**2))
+
+        rot_matrix = data.xmat[1].reshape(3, 3)
+
+        # pitch_check = np.arctan2(-rot_matrix[2, 0],
+        #                          np.sqrt(rot_matrix[0, 0]**2 + rot_matrix[1, 0]**2))
+        # roll_check = np.arctan2(
+        #     rot_matrix[1, 0] / np.cos(pitch_check), rot_matrix[0, 0] / np.cos(pitch_check))
+        # yaw_check = np.arctan2(rot_matrix[2, 1] / np.cos(pitch_check),
+        #                        rot_matrix[2, 2] / np.cos(pitch_check))
+
+        # print(pitch)
+        # data.qpos[3] = roll
+        # data.qpos[4] = pitch
+
+        roll_check, pitch_check, yaw_check = euler.mat2euler(
+            rot_matrix, axes='sxyz')
+
+        # Quaternion representation
+        qw = math.cos(roll/2) * math.cos(pitch/2)
+        qx = math.sin(roll/2) * math.cos(pitch/2)
+        qy = math.cos(roll/2) * math.sin(pitch/2)
+        qz = math.sin(roll/2) * math.sin(pitch/2)
+
+        body2_id = model.body('box_body_hat').id
+        # data.mocap_quat[0] = np.array([qw, qx, qy, qz])
+
+        data.mocap_quat[0] = euler.euler2quat(
+            roll, pitch, 0, axes='sxyz')
+
+        # print(f"Roll: {roll + math.pi}:{roll_check} and {pitch}:{pitch_check}")
+
+        print(f"Roll: {math.degrees(roll)} | {math.degrees(roll_check)} -> Pitch: {math.degrees(pitch)} | {math.degrees(pitch_check)}")
+
     def print(self):
         """
         Print the current sensor data for accelerometer, gyro, and magnetometer.
         """
         print(f"Accel: {self.accel}")
-        print(f"Gyro : {self.gyro}")
-        print(f"Mag  : {self.mag}")
+        # print(f"Gyro : {self.gyro}")
+        # print(f"Mag  : {self.mag}")
+
+        self.compute_orientation()
 
 
 # More legible printing from numpy
@@ -92,9 +146,9 @@ accel_id = model.sensor('BMI088_ACC').id
 gyro_id = model.sensor('BMI088_GYR').id
 mag_id = model.sensor('BMI088_MAG').id
 
-roll_vel_id = model.actuator('roll_velocity').id
-pitch_vel_id = model.actuator('pitch_velocity').id
-yaw_vel_id = model.actuator('yaw_velocity').id
+# roll_vel_id = model.actuator('roll_velocity').id
+# pitch_vel_id = model.actuator('pitch_velocity').id
+# yaw_vel_id = model.actuator('yaw_velocity').id
 
 # Accelorometer Noise
 noise_density = 175e-6  # 175 µg/√Hz in g/√Hz (BMI088)
@@ -114,14 +168,25 @@ gyro_noise = gyro_noise * math.pi / 180  # Convert to rad/s
 # model.sensor_noise[accel_id] = acc_noise
 bmi088 = IMU(model, data, accel_id, gyro_id, mag_id)
 
+data.qpos[:4] = euler.euler2quat(0, math.pi/2, 0, axes='sxyz')
+# data.qpos[0] = math.radians(30)
+# data.qpos[1] = math.radians(60)
+# data.qpos[1] = math.pi/8
+pitch_in = 0
 # simulate and render
 for _ in range(10000):
     if viewer.is_alive:
-        data.ctrl[roll_vel_id] = 1
+
+        # data.ctrl[roll_vel_id] = 2
+        # data.ctrl[pitch_vel_id] = 2
+        pitch_in = pitch_in + 0.01
+        data.qpos[:4] = euler.euler2quat(0, pitch_in, 0, axes='sxyz')
         mujoco.mj_step(model, data)
-        viewer.render()
+
         bmi088.update()
         bmi088.print()
+
+        viewer.render()
 
     else:
         break

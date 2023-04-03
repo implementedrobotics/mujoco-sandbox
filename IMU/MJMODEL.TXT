@@ -1,26 +1,28 @@
 MuJoCo version 2.3.2
 model name     IMU_test
 
-nq                    4
-nv                    3
-nbody                 2
-njnt                  1
-ngeom                 2
+nq                    6
+nv                    6
+nu                    3
+nbody                 3
+njnt                  6
+ngeom                 3
 nsite                 1
+ncam                  2
 nlight                1
 ntex                  1
 ntexdata              786432
 nmat                  1
 nsensor               3
-nnames                115
-nnames_map            24
-nM                    6
-nD                    9
+nnames                237
+nnames_map            48
+nM                    12
+nD                    18
 njmax                 -1
 nconmax               -1
 nstack                1703936
 nsensordata           9
-nbuffer               795168
+nbuffer               799936
 
 timestep              0.001   
 apirate               1e+02   
@@ -39,7 +41,7 @@ solver                2
 iterations            100
 noslip_iterations     0
 mpr_iterations        50
-disableflags          0
+disableflags          16
 enableflags           0
 gravity               0         0        -9.8      
 wind                  0         0         0        
@@ -47,17 +49,17 @@ magnetic              0        -0.5       0
 o_solref              0.02      1        
 o_solimp              0.9       0.95      0.001     0.5       2        
 
-totalmass             1       
+totalmass             9       
 
-meaninertia           0.1     
-meanmass              1       
+meaninertia           0.077   
+meanmass              4.5     
 meansize              0.17    
 extent                2       
 center                0        0        0       
 
-qpos0                 1         0         0         0        
+qpos0                 0         0         0         0         0         0        
 
-qpos_spring           1         0         0         0        
+qpos_spring           0         0         0         0         0         0        
 
 
 BODY 0:
@@ -79,7 +81,7 @@ BODY 0:
   body_ipos             0         0         0        
   body_iquat            1         0         0         0        
   body_mass             0        
-  body_subtreemass      1        
+  body_subtreemass      9        
   body_inertia          0         0         0        
   body_invweight0       0         0        
   body_gravcomp         0        
@@ -91,15 +93,15 @@ BODY 1:
   body_rootid           1 
   body_weldid           1 
   body_mocapid          -1 
-  body_jntnum           1 
+  body_jntnum           3 
   body_jntadr           0 
   body_dofnum           3 
   body_dofadr           0 
   body_geomnum          1 
   body_geomadr          1 
-  body_simple           1 
+  body_simple           0 
   body_sameframe        1 
-  body_pos              0         0         0.5      
+  body_pos              0         0         0.25     
   body_quat             1         0         0         0        
   body_ipos             0         0         0        
   body_iquat            1         0         0         0        
@@ -110,13 +112,118 @@ BODY 1:
   body_gravcomp         0        
   body_plugin           -1 
 
+BODY 2:
+  name                  box_body_hat
+  body_parentid         0 
+  body_rootid           2 
+  body_weldid           2 
+  body_mocapid          -1 
+  body_jntnum           3 
+  body_jntadr           3 
+  body_dofnum           3 
+  body_dofadr           3 
+  body_geomnum          1 
+  body_geomadr          2 
+  body_simple           0 
+  body_sameframe        1 
+  body_pos              0         0         0.25     
+  body_quat             1         0         0         0        
+  body_ipos             0         0         0        
+  body_iquat            1         0         0         0        
+  body_mass             8        
+  body_subtreemass      8        
+  body_inertia          0.053     0.053     0.053    
+  body_invweight0       0         19       
+  body_gravcomp         0        
+  body_plugin           -1 
+
 
 JOINT 0:
-  name                  box_joint
-  jnt_type              1 
+  name                  roll_joint
+  jnt_type              3 
   jnt_qposadr           0 
   jnt_dofadr            0 
   jnt_bodyid            1 
+  jnt_group             0 
+  jnt_limited           0 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              1         0         0        
+  jnt_stiffness         0        
+  jnt_range             0         0        
+  jnt_margin            0        
+
+JOINT 1:
+  name                  pitch_joint
+  jnt_type              3 
+  jnt_qposadr           1 
+  jnt_dofadr            1 
+  jnt_bodyid            1 
+  jnt_group             0 
+  jnt_limited           0 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              0         1         0        
+  jnt_stiffness         0        
+  jnt_range             0         0        
+  jnt_margin            0        
+
+JOINT 2:
+  name                  yaw_joint
+  jnt_type              3 
+  jnt_qposadr           2 
+  jnt_dofadr            2 
+  jnt_bodyid            1 
+  jnt_group             0 
+  jnt_limited           0 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              0         0         1        
+  jnt_stiffness         0        
+  jnt_range             0         0        
+  jnt_margin            0        
+
+JOINT 3:
+  name                  roll_joint_hat
+  jnt_type              3 
+  jnt_qposadr           3 
+  jnt_dofadr            3 
+  jnt_bodyid            2 
+  jnt_group             0 
+  jnt_limited           0 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              1         0         0        
+  jnt_stiffness         0        
+  jnt_range             0         0        
+  jnt_margin            0        
+
+JOINT 4:
+  name                  pitch_joint_hat
+  jnt_type              3 
+  jnt_qposadr           4 
+  jnt_dofadr            4 
+  jnt_bodyid            2 
+  jnt_group             0 
+  jnt_limited           0 
+  jnt_solref            0.02      1        
+  jnt_solimp            0.9       0.95      0.001     0.5       2        
+  jnt_pos               0         0         0        
+  jnt_axis              0         1         0        
+  jnt_stiffness         0        
+  jnt_range             0         0        
+  jnt_margin            0        
+
+JOINT 5:
+  name                  yaw_joint_hat
+  jnt_type              3 
+  jnt_qposadr           5 
+  jnt_dofadr            5 
+  jnt_bodyid            2 
   jnt_group             0 
   jnt_limited           0 
   jnt_solref            0.02      1        
@@ -133,7 +240,7 @@ DOF 0:
   dof_jntid             0 
   dof_parentid          -1 
   dof_Madr              0 
-  dof_simplenum         3 
+  dof_simplenum         0 
   dof_solref            0.02      1        
   dof_solimp            0.9       0.95      0.001     0.5       2        
   dof_frictionloss      0        
@@ -144,10 +251,10 @@ DOF 0:
 
 DOF 1:
   dof_bodyid            1 
-  dof_jntid             0 
+  dof_jntid             1 
   dof_parentid          0 
   dof_Madr              1 
-  dof_simplenum         2 
+  dof_simplenum         0 
   dof_solref            0.02      1        
   dof_solimp            0.9       0.95      0.001     0.5       2        
   dof_frictionloss      0        
@@ -158,10 +265,10 @@ DOF 1:
 
 DOF 2:
   dof_bodyid            1 
-  dof_jntid             0 
+  dof_jntid             2 
   dof_parentid          1 
   dof_Madr              3 
-  dof_simplenum         1 
+  dof_simplenum         0 
   dof_solref            0.02      1        
   dof_solimp            0.9       0.95      0.001     0.5       2        
   dof_frictionloss      0        
@@ -169,6 +276,48 @@ DOF 2:
   dof_damping           0        
   dof_invweight0        10       
   dof_M0                0.1      
+
+DOF 3:
+  dof_bodyid            2 
+  dof_jntid             3 
+  dof_parentid          -1 
+  dof_Madr              6 
+  dof_simplenum         0 
+  dof_solref            0.02      1        
+  dof_solimp            0.9       0.95      0.001     0.5       2        
+  dof_frictionloss      0        
+  dof_armature          0        
+  dof_damping           0        
+  dof_invweight0        19       
+  dof_M0                0.053    
+
+DOF 4:
+  dof_bodyid            2 
+  dof_jntid             4 
+  dof_parentid          3 
+  dof_Madr              7 
+  dof_simplenum         0 
+  dof_solref            0.02      1        
+  dof_solimp            0.9       0.95      0.001     0.5       2        
+  dof_frictionloss      0        
+  dof_armature          0        
+  dof_damping           0        
+  dof_invweight0        19       
+  dof_M0                0.053    
+
+DOF 5:
+  dof_bodyid            2 
+  dof_jntid             5 
+  dof_parentid          4 
+  dof_Madr              9 
+  dof_simplenum         0 
+  dof_solref            0.02      1        
+  dof_solimp            0.9       0.95      0.001     0.5       2        
+  dof_frictionloss      0        
+  dof_armature          0        
+  dof_damping           0        
+  dof_invweight0        19       
+  dof_M0                0.053    
 
 
 GEOM 0:
@@ -221,6 +370,31 @@ GEOM 1:
   geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
   geom_rgba             0.8       0         0         1        
 
+GEOM 2:
+  name                  
+  geom_type             6 
+  geom_contype          1 
+  geom_conaffinity      1 
+  geom_condim           3 
+  geom_bodyid           2 
+  geom_dataid           -1 
+  geom_matid            -1 
+  geom_group            0 
+  geom_priority         0 
+  geom_sameframe        1 
+  geom_solmix           1        
+  geom_solref           0.02      1        
+  geom_solimp           0.9       0.95      0.001     0.5       2        
+  geom_size             0.1       0.1       0.1      
+  geom_rbound           0.17     
+  geom_pos              0         0         0        
+  geom_quat             1         0         0         0        
+  geom_friction         1         0.005     0.0001   
+  geom_margin           0        
+  geom_gap              0        
+  geom_fluid            0         0         0         0         0         0         0         0         0         0         0         0        
+  geom_rgba             1         0.8       0         1        
+
 
 SITE 0:
   name                  imu_site
@@ -228,11 +402,38 @@ SITE 0:
   site_bodyid           1 
   site_matid            -1 
   site_group            0 
-  site_sameframe        1 
+  site_sameframe        0 
   site_size             0.01      0.005     0.005    
   site_pos              0         0         0        
-  site_quat             1         0         0         0        
-  site_rgba             0.5       0.5       0.5       1        
+  site_quat             1.3e-06   1         0         0        
+  site_rgba             1         0         0         1        
+
+
+CAMERA 0:
+  name                  back
+  cam_mode              2 
+  cam_bodyid            1 
+  cam_targetbodyid      -1 
+  cam_pos              -3         0         1        
+  cam_quat              0.6       0.37     -0.37     -0.6      
+  cam_poscom0          -3         0         1        
+  cam_pos0             -3         0         1        
+  cam_mat0             -5.6e-17   0.45     -0.89     -1         5.6e-17   5.6e-17   5.6e-17   0.89      0.45     
+  cam_fovy              45       
+  cam_ipd               0.068    
+
+CAMERA 1:
+  name                  side
+  cam_mode              2 
+  cam_bodyid            1 
+  cam_targetbodyid      -1 
+  cam_pos               0        -3         1        
+  cam_quat              0.85      0.53      0         0        
+  cam_poscom0           0        -3         1        
+  cam_pos0              0        -3         1        
+  cam_mat0              1         0         0         0         0.45     -0.89      0         0.89      0.45     
+  cam_fovy              45       
+  cam_ipd               0.068    
 
 
 LIGHT 0:
@@ -245,7 +446,7 @@ LIGHT 0:
   light_active          1 
   light_pos             0        -20        4        
   light_dir             0         0        -1        
-  light_poscom0         0        -20        3.5      
+  light_poscom0         0        -20        3.8      
   light_pos0            0        -20        4        
   light_dir0            0         0        -1        
   light_attenuation     1         0         0        
@@ -276,8 +477,87 @@ MATERIAL 0:
   mat_rgba              1         1         1         1        
 
 
+ACTUATOR 0:
+  name                  roll_velocity
+  actuator_trntype      0 
+  actuator_dyntype      0 
+  actuator_gaintype     0 
+  actuator_biastype     1 
+  actuator_trnid        0  -1 
+  actuator_actadr       -1 
+  actuator_actnum       0 
+  actuator_group        0 
+  actuator_ctrllimited  0 
+  actuator_forcelimited 0 
+  actuator_actlimited   0 
+  actuator_dynprm       1         0         0         0         0         0         0         0         0         0        
+  actuator_gainprm      1e+02     0         0         0         0         0         0         0         0         0        
+  actuator_biasprm      0         0        -1e+02     0         0         0         0         0         0         0        
+  actuator_ctrlrange    0         0        
+  actuator_forcerange   0         0        
+  actuator_actrange     0         0        
+  actuator_gear         1         0         0         0         0         0        
+  actuator_cranklength  0        
+  actuator_acc0         10       
+  actuator_length0      0        
+  actuator_lengthrange  0         0        
+  actuator_plugin       -1 
+
+ACTUATOR 1:
+  name                  pitch_velocity
+  actuator_trntype      0 
+  actuator_dyntype      0 
+  actuator_gaintype     0 
+  actuator_biastype     1 
+  actuator_trnid        1  -1 
+  actuator_actadr       -1 
+  actuator_actnum       0 
+  actuator_group        0 
+  actuator_ctrllimited  0 
+  actuator_forcelimited 0 
+  actuator_actlimited   0 
+  actuator_dynprm       1         0         0         0         0         0         0         0         0         0        
+  actuator_gainprm      1e+02     0         0         0         0         0         0         0         0         0        
+  actuator_biasprm      0         0        -1e+02     0         0         0         0         0         0         0        
+  actuator_ctrlrange    0         0        
+  actuator_forcerange   0         0        
+  actuator_actrange     0         0        
+  actuator_gear         1         0         0         0         0         0        
+  actuator_cranklength  0        
+  actuator_acc0         10       
+  actuator_length0      0        
+  actuator_lengthrange  0         0        
+  actuator_plugin       -1 
+
+ACTUATOR 2:
+  name                  yaw_velocity
+  actuator_trntype      0 
+  actuator_dyntype      0 
+  actuator_gaintype     0 
+  actuator_biastype     1 
+  actuator_trnid        2  -1 
+  actuator_actadr       -1 
+  actuator_actnum       0 
+  actuator_group        0 
+  actuator_ctrllimited  0 
+  actuator_forcelimited 0 
+  actuator_actlimited   0 
+  actuator_dynprm       1         0         0         0         0         0         0         0         0         0        
+  actuator_gainprm      1e+02     0         0         0         0         0         0         0         0         0        
+  actuator_biasprm      0         0        -1e+02     0         0         0         0         0         0         0        
+  actuator_ctrlrange    0         0        
+  actuator_forcerange   0         0        
+  actuator_actrange     0         0        
+  actuator_gear         1         0         0         0         0         0        
+  actuator_cranklength  0        
+  actuator_acc0         10       
+  actuator_length0      0        
+  actuator_lengthrange  0         0        
+  actuator_plugin       -1 
+
+
 SENSOR 0:
-  name                  accel_sensor
+  name                  BMI088_ACC
   sensor_type           1 
   sensor_datatype       0 
   sensor_needstage      3 
@@ -288,11 +568,11 @@ SENSOR 0:
   sensor_dim            3 
   sensor_adr            0 
   sensor_cutoff         0        
-  sensor_noise          0        
+  sensor_noise          0.0018   
   sensor_plugin         -1 
 
 SENSOR 1:
-  name                  gyro_sensor
+  name                  BMI088_GYR
   sensor_type           3 
   sensor_datatype       0 
   sensor_needstage      2 
@@ -303,11 +583,11 @@ SENSOR 1:
   sensor_dim            3 
   sensor_adr            3 
   sensor_cutoff         0        
-  sensor_noise          0        
+  sensor_noise          0.0024   
   sensor_plugin         -1 
 
 SENSOR 2:
-  name                  magnetometer_sensor
+  name                  BMI088_MAG
   sensor_type           6 
   sensor_datatype       0 
   sensor_needstage      1 
