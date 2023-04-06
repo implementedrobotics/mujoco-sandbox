@@ -135,7 +135,7 @@ for _ in range(1000):
 
 # Plot the results
 fig, ax = plt.subplots(2, 1, figsize=(8, 6))
-ax[0].plot(ts, encoder_values, label='Encoder pos')
+ax[0].step(ts, encoder_values, label='Encoder pos', where='post')
 ax[0].plot(ts, truth_values, label='Truth')
 ax[0].plot(ts, sensor_values, label='Sensor')
 
