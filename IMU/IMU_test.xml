@@ -1,7 +1,7 @@
 <mujoco model="IMU_test">
 	<compiler angle="radian" coordinate="local" />
-	<option gravity="0 0 -10" integrator="RK4" timestep="0.001">
-		<flag contact="disable" sensornoise="disable" />
+	<option gravity="0 0 -9.81" magnetic="1 0 0" integrator="Euler" timestep="0.002">
+		<flag contact="disable" sensornoise="enable" />
 	</option>
 	<asset>
 		<texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
@@ -13,7 +13,6 @@
 		<body name="box_body" pos="0 0 .25">
 			<camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom" />
 			<camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom" />
-			<!-- <site name="imu_site" pos="0 0 0" size="0.01" /> -->
 			<joint name="box_joint" type="ball" />
 			<!--
 			<joint name="yaw_joint" type="hinge" pos="0 0 0" axis="0 0 1" />
@@ -24,20 +23,11 @@
 			<geom type="box" size="0.1 0.1 0.1" rgba="0.8 0 0 1" />
 			<site name="imu_site" pos="0 0 0" euler="0 0 0" type="box" size=".03 .03" rgba="1 0 0 1" />
 		</body>
-		<body name="box_body_hat" pos=".25 0 .25" euler="0  0 0" mocap="true">
-			<!-- <joint name="box_joint" type="ball" /> -->
-			<!--
-			<joint name="yaw_joint_hat" type="hinge" pos="0 0 0" axis="0 0 1" />
-			<joint name="pitch_joint_hat" type="hinge" pos="0 0 0" axis="0 1 0" />
-			<joint name="roll_joint_hat" type="hinge" pos="0 0 0" axis="1 0 0" />
-			-->
-			<geom type="box" size="0.1 0.1 0.1" rgba="1.0 0.8 0 1" />
-		</body>
 	</worldbody>
 	<sensor>
 		<accelerometer name="BMI088_ACC" site="imu_site" noise="0.0018" />
 		<gyro name="BMI088_GYR" site="imu_site" noise="0.00244" />
-		<magnetometer name="BMI088_MAG" site="imu_site" />
+		<magnetometer name="BMI088_MAG" site="imu_site" noise="0.00006" />
 	</sensor>
 	<actuator>
 		<!--
