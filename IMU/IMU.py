@@ -6,6 +6,16 @@ import numpy as np
 
 from transforms3d import euler
 
+from ahrs.filters import Complementary
+
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('QtAgg')
+
+current_roll = 0
+current_pitch = 0
+current_yaw = 0
+
 
 def get_sensor_offset(model, sensor_id):
     """
@@ -70,6 +80,10 @@ class IMU:
         """
         Compute the orientation of the IMU using the magnetometer data.
         """
+        global current_roll
+        global current_pitch
+        global current_yaw
+        comp_filter = Complementary()
 
         # ax_ned = -self.accel[1]
         # ay_ned = self.accel[0]
@@ -77,28 +91,53 @@ class IMU:
         # g = np.array([ax_ned, ay_ned, -9.81])
 
         # Compute Pitch and Roll from Accelerometer
-        pitch = math.asin(self.accel[0] / (-9.81))
+        a_norm = self.accel / np.linalg.norm(self.accel)
+        pitch = math.atan2(-a_norm[0],
+                           math.sqrt(a_norm[1]**2 + a_norm[2]**2))
 
-        roll = math.atan(self.accel[1] / self.accel[2])
+        roll = math.atan2(self.accel[1], self.accel[2])
 
+        print(f"ACCEL: {self.accel} -> {a_norm}")
         # roll = math.atan2(-self.accel[0],
         #                   math.sqrt(self.accel[1]**2 + self.accel[2]**2))
 
+        quat_gnd = data.qpos[0:4]
+        print("YEAH")
+        print(quat_gnd)
         rot_matrix = data.xmat[1].reshape(3, 3)
 
-        # pitch_check = np.arctan2(-rot_matrix[2, 0],
-        #                          np.sqrt(rot_matrix[0, 0]**2 + rot_matrix[1, 0]**2))
-        # roll_check = np.arctan2(
-        #     rot_matrix[1, 0] / np.cos(pitch_check), rot_matrix[0, 0] / np.cos(pitch_check))
-        # yaw_check = np.arctan2(rot_matrix[2, 1] / np.cos(pitch_check),
-        #                        rot_matrix[2, 2] / np.cos(pitch_check))
+        pitch_check = np.arctan2(-rot_matrix[2, 0],
+                                 np.sqrt(rot_matrix[0, 0]**2 + rot_matrix[1, 0]**2))
+        roll_check = np.arctan2(
+            rot_matrix[1, 0] / np.cos(pitch_check), rot_matrix[0, 0] / np.cos(pitch_check))
+        yaw_check = np.arctan2(rot_matrix[2, 1] / np.cos(pitch_check),
+                               rot_matrix[2, 2] / np.cos(pitch_check))
+
+        # print(f"Pitch: {pitch} -> {pitch_check}")
+        # print(f"Roll: {roll} -> {roll_check}")
+        # print(f"Yaw: -> {yaw_check}")
 
         # print(pitch)
         # data.qpos[3] = roll
         # data.qpos[4] = pitch
 
-        roll_check, pitch_check, yaw_check = euler.mat2euler(
-            rot_matrix, axes='sxyz')
+        test_euler = euler.mat2euler(rot_matrix, axes='rzyx')
+        print(test_euler)
+        test_quat = euler.euler2quat(
+            test_euler[0], test_euler[1], test_euler[2], axes='rzyx')
+
+        # print("YEAH 2")
+        # print(test_quat)
+
+        print(f"EULER GND: {euler.quat2euler(quat_gnd, axes='rzyx')}")
+
+        # yaw_check, pitch_check, roll_check = euler.mat2euler(
+        #     rot_matrix, axes='rzyx')
+
+        # print("New")
+        # print(f"Pitch: {pitch} -> {pitch_check}")
+        # print(f"Roll: {roll} -> {roll_check}")
+        # print(f"Yaw: -> {yaw_check}")
 
         # Quaternion representation
         qw = math.cos(roll/2) * math.cos(pitch/2)
@@ -109,18 +148,33 @@ class IMU:
         body2_id = model.body('box_body_hat').id
         # data.mocap_quat[0] = np.array([qw, qx, qy, qz])
 
+        current_roll = current_roll + self.gyro[0] * 0.001
+        current_pitch = current_pitch + self.gyro[1] * 0.001
+        current_yaw = current_yaw + self.gyro[2] * 0.001
+
+        # test_quat = euler.euler2quat(
+        #    current_yaw, current_pitch, current_roll, axes='szyx')
+
+        print(f"Euler SENSE: ({current_yaw}, {pitch}, {roll})")
+        # print("YEAH 3")
+        # print(test_quat)
+        # print(current_roll)
+        # print(current_pitch)
+
         data.mocap_quat[0] = euler.euler2quat(
-            roll, pitch, 0, axes='sxyz')
+            0, pitch, roll, axes='rzyx')
 
-        # print(f"Roll: {roll + math.pi}:{roll_check} and {pitch}:{pitch_check}")
+        # data.mocap_quat[0] = quat_gnd
+        print(f"YAW: {current_yaw}")
 
-        print(f"Roll: {math.degrees(roll)} | {math.degrees(roll_check)} -> Pitch: {math.degrees(pitch)} | {math.degrees(pitch_check)}")
+        # print(f"Current Yaw: {current_yaw}")
+        # print(f"Roll: {math.degrees(roll)} | {math.degrees(roll_check)} -> Pitch: {math.degrees(pitch)} | {math.degrees(pitch_check)}")
 
     def print(self):
         """
         Print the current sensor data for accelerometer, gyro, and magnetometer.
         """
-        print(f"Accel: {self.accel}")
+        # print(f"Accel: {self.accel}")
         # print(f"Gyro : {self.gyro}")
         # print(f"Mag  : {self.mag}")
 
@@ -150,6 +204,10 @@ mag_id = model.sensor('BMI088_MAG').id
 # pitch_vel_id = model.actuator('pitch_velocity').id
 # yaw_vel_id = model.actuator('yaw_velocity').id
 
+# roll_motor_id = model.actuator('roll_motor').id
+# pitch_motor_id = model.actuator('pitch_motor').id
+# yaw_motor_id = model.actuator('yaw_motor').id
+
 # Accelorometer Noise
 noise_density = 175e-6  # 175 µg/√Hz in g/√Hz (BMI088)
 bandwidth = 100  # Hz [5 to 523Hz]
@@ -168,28 +226,51 @@ gyro_noise = gyro_noise * math.pi / 180  # Convert to rad/s
 # model.sensor_noise[accel_id] = acc_noise
 bmi088 = IMU(model, data, accel_id, gyro_id, mag_id)
 
-data.qpos[:4] = euler.euler2quat(0, math.pi/2, 0, axes='sxyz')
+# data.qpos[:4] = euler.euler2quat(0, 0, 0, axes='sxyz')
 # data.qpos[0] = math.radians(30)
 # data.qpos[1] = math.radians(60)
 # data.qpos[1] = math.pi/8
+
+ts = []
+ax_data = []
+ay_data = []
+az_data = []
 pitch_in = 0
 # simulate and render
-for _ in range(10000):
+for _ in range(1000):
     if viewer.is_alive:
+        ts.append(data.time)
 
-        # data.ctrl[roll_vel_id] = 2
-        # data.ctrl[pitch_vel_id] = 2
-        pitch_in = pitch_in + 0.01
-        data.qpos[:4] = euler.euler2quat(0, pitch_in, 0, axes='sxyz')
+        # data.ctrl[roll_motor_id] = 1
+        # data.ctrl[pitch_motor_id] = 1
+        data.qpos[:4] = euler.euler2quat(
+            0, pitch_in, math.pi/4+pitch_in, axes='rzyx')
         mujoco.mj_step(model, data)
 
+        pitch_in = pitch_in + 0.02
         bmi088.update()
         bmi088.print()
+        ax_data.append(bmi088.accel[0])
+        ay_data.append(bmi088.accel[1])
+        az_data.append(bmi088.accel[2])
 
         viewer.render()
 
     else:
         break
+
+
+# Plot the results
+fig, ax = plt.subplots(2, 1, figsize=(8, 6))
+ax[0].plot(ts, ax_data, label='X')
+ax[0].plot(ts, ay_data, label='Y')
+ax[0].plot(ts, az_data, label='Z')
+ax[0].set_ylabel('Accelerometer')
+ax[0].legend()
+
+
+plt.show()
+
 
 # close
 viewer.close()
