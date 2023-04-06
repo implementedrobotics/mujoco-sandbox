@@ -152,16 +152,7 @@ class IMU:
         # Quaternion Estimate from Accelerometer
         q_am = euler.euler2quat(psi, theta, phi, axes='rzyx')
 
-        # quat_gnd = data.qpos[0:4]
-
         self.q = q_omega * (1 - self.alpha) + q_am * self.alpha
-
-        # print(f"EULER COMP: {euler.quat2euler(self.q, axes='rzyx')}")
-        # print(f"EULER ACCEL: {psi}, {theta}, {phi}")
-        # print(f"EULER GYRO: {euler.quat2euler(q_omega, axes='rzyx')}")
-        # print(f"EULER GND: {euler.quat2euler(quat_gnd, axes='rzyx')}")
-
-        # print("\n")
 
     def get_euler(self):
         """
@@ -235,7 +226,7 @@ gyro_bias = 1.0 * math.pi / 180.0  # dps -> rps
 
 q0 = euler.euler2quat(0, 0, 0, axes='rzyx')
 bmi088 = IMU(model, data, accel_id, gyro_id, mag_id, gyro_bias=[gyro_bias, gyro_bias, gyro_bias],
-             dt=0.002, alpha=0.05, q0=q0)
+             dt=0.01, alpha=0.05, q0=q0)
 
 
 ts = []
@@ -272,16 +263,10 @@ for _ in range(1000):
         truth_theta_data.append(math.degrees(truth_euler[1]))
         truth_phi_data.append(math.degrees(truth_euler[2]))
 
-        # ax_data.append(bmi088.accel[0])
-        # ay_data.append(bmi088.accel[1])
-        # az_data.append(bmi088.accel[2])
-
         viewer.render()
 
     else:
         break
-
-print("Done")
 
 # Plot the results
 fig, ax = plt.subplots(2, 1, figsize=(8, 6))
