@@ -1,6 +1,6 @@
 <mujoco model="IMU_test">
 	<compiler angle="radian" coordinate="local" />
-	<option gravity="0 0 -9.81" magnetic="1 0 0" integrator="Euler" timestep="0.002">
+	<option gravity="0 0 -9.81" magnetic="1 0 0" integrator="RK4" timestep="0.002">
 		<flag contact="disable" sensornoise="enable" />
 	</option>
 	<asset>

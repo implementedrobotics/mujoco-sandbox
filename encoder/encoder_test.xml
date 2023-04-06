@@ -1,0 +1,36 @@
+<mujoco model="encoder_test">
+	<compiler angle="radian" coordinate="local" />
+	<option gravity="0 0 -9.81" magnetic="1 0 0" integrator="RK4" timestep="0.002">
+		<flag contact="disable" sensornoise="enable" />
+	</option>
+	<visual>
+		<quality shadowsize="16384" />
+		<scale framelength="1.5" framewidth="0.15" />
+	</visual>
+	<asset>
+		<texture name="grid" type="2d" builtin="checker" width="512" height="512" rgb1=".1 .2 .3" rgb2=".2 .3 .4" />
+		<material name="grid" texture="grid" texrepeat="1 1" texuniform="true" reflectance=".2" />
+	</asset>
+	<worldbody>
+		<geom name="floor" size="0 0 .05" type="plane" material="grid" condim="3" />
+		<light name="spotlight" mode="targetbodycom" target="rotation_body" diffuse=".8 .8 .8" specular="0.3 0.3 0.3" pos="0 -20 4" cutoff="10" />
+		<body name="rotation_body" pos="0 0 .25">
+			<camera name="back" pos="-3 0 1" xyaxes="0 -1 0 1 0 2" mode="trackcom" />
+			<camera name="side" pos="0 -3 1" xyaxes="1 0 0 0 1 2" mode="trackcom" />
+			<joint name="rotary_joint" type="hinge" pos="0 0 0" axis="0 1 0" />
+			<inertial pos="0 0 0" mass="1" diaginertia="0.1 0.1 0.1" />
+			<geom type="cylinder" euler="1.5708 0 0" pos="0 0 0" size=".1 .01" rgba="0 1 0 1" mass="3" />
+		</body>
+	</worldbody>
+	<sensor>
+		<jointpos name="rotary_encoder" joint="rotary_joint" noise="0.0015" />
+	</sensor>
+	<actuator>
+		<!--
+		<motor name="roll_motor" joint="roll_joint" />
+		<motor name="pitch_motor" joint="pitch_joint" />
+		<motor name="yaw_motor" joint="yaw_joint" />
+		-->
+		<velocity name="rotational_velocity" joint="rotary_joint" kv="100" />
+	</actuator>
+</mujoco>
