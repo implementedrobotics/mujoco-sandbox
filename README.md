@@ -5,6 +5,8 @@ This repository serves as a sandbox for testing Mujoco physics simulator functio
 ## Prerequisites
 
 - Python 3.6 or higher
+- Graphviz
+  `sudo apt install graphviz`
 
 ## Setup and Installation
 
