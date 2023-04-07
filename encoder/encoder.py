@@ -86,14 +86,13 @@ data = mujoco.MjData(model)
 viewer = mujoco_viewer.MujocoViewer(
     model, data, width=1000, height=1000, hide_menus=True)
 
-
+# Get the actuator and sensor IDs
 rot_vel_id = model.actuator('rotational_velocity').id
-
 sensor_id = model.sensor('rotary_encoder').id
 
+# Create the encoder
 encoder = Encoder(model, data, sensor_id=sensor_id,
                   ppr=1000, index_angle=0)
-
 
 truth_values = []
 sensor_values = []
@@ -105,29 +104,22 @@ for _ in range(1000):
     if viewer.is_alive:
         ts.append(data.time)
 
+        # Set the rotational velocity
         data.ctrl[rot_vel_id] = 1.0
+
+        # Step Simulation
         mujoco.mj_step(model, data)
 
+        # Read/Update the encoder
         encoder.update()
 
+        #  Store the values for plotting
         truth_values.append(data.qpos[0])
         sensor_values.append(data.sensordata[sensor_id])
         encoder_values.append(encoder.encoder_value /
                               encoder.ppr * (math.pi * 2))
 
-        # Encoder Position
-
-        # Get roll, pitch, yaw
-        # psi_data.append(math.degrees(bmi088.get_euler()[0]))
-        # theta_data.append(math.degrees(bmi088.get_euler()[1]))
-        # phi_data.append(math.degrees(bmi088.get_euler()[2]))
-
-        # # Get ground truth roll, pitch, yaw
-        # truth_euler = euler.quat2euler(data.qpos[0:4], axes='rzyx')
-        # truth_psi_data.append(math.degrees(truth_euler[0]))
-        # truth_theta_data.append(math.degrees(truth_euler[1]))
-        # truth_phi_data.append(math.degrees(truth_euler[2]))
-
+        # Render
         viewer.render()
 
     else:
